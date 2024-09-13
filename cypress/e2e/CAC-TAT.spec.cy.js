@@ -15,7 +15,7 @@ describe("Central de Atendimento ao Cliente TAT", () => {
     cy.get("#lastName").should("be.visible").type("Costa").should("have.value", "Costa");
     cy.get("#email").should("be.visible").type("gabrielcosta@gmail.com").should("have.value", "gabrielcosta@gmail.com");
     cy.get("#open-text-area").should("be.visible").type(longText, { delay: 0 }).should("have.value", longText);
-    cy.get("button[type='submit'].button").click();
+    cy.contains("button", "Enviar").click();
     cy.get("span.success").should("be.visible");
   });
 
@@ -24,7 +24,7 @@ describe("Central de Atendimento ao Cliente TAT", () => {
     cy.get("#lastName").should("be.visible").type("Costa").should("have.value", "Costa");
     cy.get("#email").should("be.visible").type("gabrielcostagmail.com").should("have.value", "gabrielcostagmail.com");
     cy.get("#open-text-area").should("be.visible").type("Teste").should("have.value", "Teste");
-    cy.get("button[type='submit'].button").click();
+    cy.contains("button", "Enviar").click();
     cy.get("span.error").should("be.visible");
   });
 
@@ -39,7 +39,7 @@ describe("Central de Atendimento ao Cliente TAT", () => {
     cy.get("#phone-checkbox").click();
     cy.get("#phone").should("be.visible").should("have.value", "");
     cy.get("#open-text-area").should("be.visible").type("Teste").should("have.value", "Teste");
-    cy.get("button[type='submit'].button").click();
+    cy.contains("button", "Enviar").click();
     cy.get("span.error").should("be.visible");
   });
 
@@ -48,11 +48,11 @@ describe("Central de Atendimento ao Cliente TAT", () => {
   });
 
   it("7 - Exibe mensagem de errro ao submeter o formulário sem preencher os campos obrigatórios", () => {
-    cy.get("button[type='submit'].button").click();
+    cy.contains("button", "Enviar").click();
     cy.get("span.error").should("be.visible");
   });
 
-  it.only("8 - Envia o formulário com sucesso usando um comando costumizado", () => {
+  it("8 - Envia o formulário com sucesso usando um comando costumizado", () => {
     cy.fillMandatoryFieldsAndSubmit();
   });
 });
