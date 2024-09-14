@@ -55,4 +55,16 @@ describe("Central de Atendimento ao Cliente TAT", () => {
   it("8 - Envia o formulário com sucesso usando um comando costumizado", () => {
     cy.fillMandatoryFieldsAndSubmit();
   });
+
+  it("9 - Seleciona um produto (Youtube) por seu texto", () => {
+    cy.get("#product").select("YouTube").find("option:selected").should("have.text", "YouTube");
+  });
+
+  it("10 - seleciona um produto (Mentoria) por seu valor (value)", () => {
+    cy.get("#product").select("mentoria").should("have.value", "mentoria");
+  });
+
+  it.only("11 - seleciona um produto (Blog) por seu índice", () => {
+    cy.get("#product").select(1).should("have.value", 'blog');
+  });
 });
