@@ -32,11 +32,11 @@ describe("Central de Atendimento ao Cliente TAT", () => {
     cy.get("#phone").should("be.visible").type("abc").should("have.value", "");
   });
 
-  it("5 - Exibe mensagem de erro quando o telefone se torna obrigatório, mas não é preenchido antes do envio do formulário", () => {
+  it.only("5 - Exibe mensagem de erro quando o telefone se torna obrigatório, mas não é preenchido antes do envio do formulário", () => {
     cy.get("#firstName").should("be.visible").type("Gabriel").should("have.value", "Gabriel");
     cy.get("#lastName").should("be.visible").type("Costa").should("have.value", "Costa");
     cy.get("#email").should("be.visible").type("gabrielcosta@gmail.com").should("have.value", "gabrielcosta@gmail.com");
-    cy.get("#phone-checkbox").click();
+    cy.get("#phone-checkbox").check();
     cy.get("#phone").should("be.visible").should("have.value", "");
     cy.get("#open-text-area").should("be.visible").type("Teste").should("have.value", "Teste");
     cy.contains("button", "Enviar").click();
@@ -72,10 +72,16 @@ describe("Central de Atendimento ao Cliente TAT", () => {
     cy.get('input[type="radio"][value="feedback"]').check("feedback").should("have.value", "feedback");
   });
 
-  it.only("13 - Marca cada tipo de atendimento", () => {
-    cy.get('input[type="radio"]').should('have.length', 3).each(($radio) => {
-      cy.wrap($radio).check()
-      cy.wrap($radio).should('be.checked')
-    });
+  it("13 - Marca cada tipo de atendimento", () => {
+    cy.get('input[type="radio"]')
+      .should("have.length", 3)
+      .each(($radio) => {
+        cy.wrap($radio).check();
+        cy.wrap($radio).should("be.checked");
+      });
+  });
+
+  it("14 - Marca ambos checkboxes, depois desmarca o último", () => {
+    cy.get("input[type='checkbox']").check().last().uncheck().should("not.be.checked");
   });
 });
