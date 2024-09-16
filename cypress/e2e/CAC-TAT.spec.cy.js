@@ -32,7 +32,7 @@ describe("Central de Atendimento ao Cliente TAT", () => {
     cy.get("#phone").should("be.visible").type("abc").should("have.value", "");
   });
 
-  it.only("5 - Exibe mensagem de erro quando o telefone se torna obrigatório, mas não é preenchido antes do envio do formulário", () => {
+  it("5 - Exibe mensagem de erro quando o telefone se torna obrigatório, mas não é preenchido antes do envio do formulário", () => {
     cy.get("#firstName").should("be.visible").type("Gabriel").should("have.value", "Gabriel");
     cy.get("#lastName").should("be.visible").type("Costa").should("have.value", "Costa");
     cy.get("#email").should("be.visible").type("gabrielcosta@gmail.com").should("have.value", "gabrielcosta@gmail.com");
@@ -80,8 +80,43 @@ describe("Central de Atendimento ao Cliente TAT", () => {
         cy.wrap($radio).should("be.checked");
       });
   });
-
   it("14 - Marca ambos checkboxes, depois desmarca o último", () => {
     cy.get("input[type='checkbox']").check().last().uncheck().should("not.be.checked");
+  });
+
+  it("15 - Seleciona um arquivo da pasta fixtures", () => {
+    cy.get("input[type='file']#file-upload")
+      .should("not.have.value")
+      .selectFile("cypress/fixtures/example.json")
+      .should(function ($input) {
+        expect($input[0].files[0].name).to.equal("example.json");
+      });
+  });
+
+  it("16 - Seleciona um arquivo simulando um drag-and-drop", () => {
+    cy.get("input[type='file']#file-upload")
+      .should("not.have.value")
+      .selectFile("cypress/fixtures/example.json", { action: "drag-drop" })
+      .should(($input) => {
+        expect($input[0].files[0].name).to.equal("example.json");
+      });
+  });
+
+  it("17 - Seleciona um arquivo utilizando uma fixture para a qual foi dada um alias", () => {
+    cy.fixture("example.json").as("sampleFile");
+    cy.get("input[type='file']#file-upload")
+      .selectFile("@sampleFile")
+      .should(($input) => {
+        expect($input[0].files[0].name).to.equal("example.json");
+      });
+  });
+
+  it("18 - Verifica que a política de privacidade abre em outra aba sem a necessidade de um clique", () => {
+    cy.get("a[href='privacy.html']").should("have.attr", "target", "_blank");
+  });
+
+  it("19 - Acessa a página da política de privacidade removendo o target e então clicando no link", () => {
+    cy.get("a[href='privacy.html']").invoke("removeAttr", "target").click();
+    cy.contains("Talking About Testing").should("be.visible");
   });
 });
