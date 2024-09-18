@@ -1,4 +1,5 @@
 describe("Central de Atendimento ao Cliente TAT", () => {
+  const THREE_SECONDS_IN_MS = 3000;
   beforeEach(() => {
     cy.visit("/src/index.html");
   });
@@ -8,8 +9,9 @@ describe("Central de Atendimento ao Cliente TAT", () => {
   });
 
   it("2 - Preenche os campos obrigatórios e envia o formulário", () => {
-    const longText =
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    const longText = Cypress._.repeat("Teste ", 20);
+
+    cy.clock();
 
     cy.get("#firstName").should("be.visible").type("Gabriel").should("have.value", "Gabriel");
     cy.get("#lastName").should("be.visible").type("Costa").should("have.value", "Costa");
@@ -17,15 +19,20 @@ describe("Central de Atendimento ao Cliente TAT", () => {
     cy.get("#open-text-area").should("be.visible").type(longText, { delay: 0 }).should("have.value", longText);
     cy.contains("button", "Enviar").click();
     cy.get("span.success").should("be.visible");
+    cy.tick(THREE_SECONDS_IN_MS);
+    cy.get("span.success").should("not.be.visible");
   });
 
   it("3 - Exibe mensagem de erro ao submeter o formulário com um email com formatação inválida", () => {
+    cy.clock();
     cy.get("#firstName").should("be.visible").type("Gabriel").should("have.value", "Gabriel");
     cy.get("#lastName").should("be.visible").type("Costa").should("have.value", "Costa");
     cy.get("#email").should("be.visible").type("gabrielcostagmail.com").should("have.value", "gabrielcostagmail.com");
     cy.get("#open-text-area").should("be.visible").type("Teste").should("have.value", "Teste");
     cy.contains("button", "Enviar").click();
     cy.get("span.error").should("be.visible");
+    cy.tick(THREE_SECONDS_IN_MS);
+    cy.get("span.error").should("not.be.visible");
   });
 
   it("4 - Deve permanecer vazio ao digitar um valor não númerico", () => {
@@ -33,6 +40,7 @@ describe("Central de Atendimento ao Cliente TAT", () => {
   });
 
   it("5 - Exibe mensagem de erro quando o telefone se torna obrigatório, mas não é preenchido antes do envio do formulário", () => {
+    cy.clock();
     cy.get("#firstName").should("be.visible").type("Gabriel").should("have.value", "Gabriel");
     cy.get("#lastName").should("be.visible").type("Costa").should("have.value", "Costa");
     cy.get("#email").should("be.visible").type("gabrielcosta@gmail.com").should("have.value", "gabrielcosta@gmail.com");
@@ -41,6 +49,8 @@ describe("Central de Atendimento ao Cliente TAT", () => {
     cy.get("#open-text-area").should("be.visible").type("Teste").should("have.value", "Teste");
     cy.contains("button", "Enviar").click();
     cy.get("span.error").should("be.visible");
+    cy.tick(THREE_SECONDS_IN_MS);
+    cy.get("span.error").should("not.be.visible");
   });
 
   it("6 - Preenche e limpa os campos nome, sobrenome, email e telefone", () => {
@@ -48,12 +58,19 @@ describe("Central de Atendimento ao Cliente TAT", () => {
   });
 
   it("7 - Exibe mensagem de errro ao submeter o formulário sem preencher os campos obrigatórios", () => {
+    cy.clock();
     cy.contains("button", "Enviar").click();
     cy.get("span.error").should("be.visible");
+    cy.tick(THREE_SECONDS_IN_MS);
+    cy.get("span.error").should("not.be.visible");
   });
 
   it("8 - Envia o formulário com sucesso usando um comando costumizado", () => {
+    cy.clock();
     cy.fillMandatoryFieldsAndSubmit();
+    cy.get("span.success").should("be.visible");
+    cy.tick(THREE_SECONDS_IN_MS);
+    cy.get("span.success").should("not.be.visible");
   });
 
   it("9 - Seleciona um produto (Youtube) por seu texto", () => {
@@ -118,5 +135,25 @@ describe("Central de Atendimento ao Cliente TAT", () => {
   it("19 - Acessa a página da política de privacidade removendo o target e então clicando no link", () => {
     cy.get("a[href='privacy.html']").invoke("removeAttr", "target").click();
     cy.contains("Talking About Testing").should("be.visible");
+  });
+
+  it("20 - Exibe e esconde as mensagens de sucesso e erro usando o .invoke", () => {
+    cy.get(".success").should("not.be.visible").invoke("show").should("be.visible").and("contain", "Mensagem enviada com sucesso.").invoke("hide").should("not.be.visible");
+    cy.get(".error").should("not.be.visible").invoke("show").should("be.visible").and("contain", "Valide os campos obrigatórios!").invoke("hide").should("not.be.visible");
+  });
+
+  it("21 - Preenche a area de texto usando o comando invoke", () => {
+    const longText = Cypress._.repeat("Teste ", 20);
+
+    cy.get("#open-text-area").invoke("val", longText).should("have.value", longText);
+  });
+
+  it.only("22 - Faz uma requisição HTTP", () => {
+    cy.request("https://cac-tat.s3.eu-central-1.amazonaws.com/index.html").should((response) => {
+      const { status, statusText, body } = response;
+      expect(status).to.equal(200);
+      expect(statusText).to.equal("OK");
+      expect(body).to.include("CAC TAT");
+    });
   });
 });
