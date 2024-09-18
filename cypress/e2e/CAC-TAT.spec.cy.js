@@ -148,12 +148,18 @@ describe("Central de Atendimento ao Cliente TAT", () => {
     cy.get("#open-text-area").invoke("val", longText).should("have.value", longText);
   });
 
-  it.only("22 - Faz uma requisição HTTP", () => {
+  it("22 - Faz uma requisição HTTP", () => {
     cy.request("https://cac-tat.s3.eu-central-1.amazonaws.com/index.html").should((response) => {
       const { status, statusText, body } = response;
       expect(status).to.equal(200);
       expect(statusText).to.equal("OK");
       expect(body).to.include("CAC TAT");
     });
+  });
+
+  it.only("Desafio - Encontre o gato", () => {
+    cy.get("span#cat").should("not.be.visible").invoke("show").should("be.visible");
+    cy.get("#title").invoke("text", "CAT TAT");
+    cy.get("#subtitle").invoke("text", "Eu encontrei o gato!");
   });
 });
